@@ -1,7 +1,16 @@
 #include <LiquidCrystal.h>
 #include "DHT.h"
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+  #include <avr/power.h>
+#endif
 #define DHTPIN 7
 #define DHTTYPE DHT11
+#define PIN 9
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(60, PIN, NEO_GRB + NEO_KHZ800);
+
+
+
 
 //LCD
 const int RS = 11, EN = 12, D4 = 2, D5 = 3, D6 = 4, D7 = 5; //LCD Pins
@@ -34,6 +43,15 @@ void setup() {
   //Setup Rotary Encoder
   pinMode (encoder0PinA, INPUT);
   pinMode (encoder0PinB, INPUT);
+
+  //Adafruit LED-Strip
+  #if defined (__AVR_ATtiny85__)
+    if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
+  #endif
+
+  strip.begin();
+  strip.setBrightness(10);
+  strip.show();
 }
 
 
@@ -82,7 +100,38 @@ void loop() {
       lcd.setCursor(10, 1);
       lcd.print(encoder0Pos);
       
-    }
+      }
     encoder0PinALast = n;
-  }  
-}
+    }
+
+
+  colorWipe(strip.Color(250, 0, 0), 50);
+  colorWipe(strip.Color(200, 0, 0), 50);
+  colorWipe(strip.Color(150, 0, 0), 50);
+  colorWipe(strip.Color(100, 0, 0), 50);
+  colorWipe(strip.Color(50, 0, 0), 50);
+
+  colorWipe(strip.Color(0, 250, 0), 50);
+  colorWipe(strip.Color(0, 200, 0), 50);
+  colorWipe(strip.Color(0, 150, 0), 50);
+  colorWipe(strip.Color(0, 100, 0), 50);
+  colorWipe(strip.Color(0, 50, 0), 50);
+  
+  colorWipe(strip.Color(0, 0, 250), 50);
+  colorWipe(strip.Color(0, 0, 200), 50);
+  colorWipe(strip.Color(0, 0, 150), 50);
+  colorWipe(strip.Color(0, 0, 100), 50);
+  colorWipe(strip.Color(0, 0, 50), 50);
+
+
+  }
+
+
+
+
+void colorWipe(uint32_t c, uint8_t wait) {
+  for(uint16_t i=0; i<strip.numPixels(); i++) {
+    strip.setPixelColor(i, c);
+    strip.show();
+    delay(10);  }
+  }
