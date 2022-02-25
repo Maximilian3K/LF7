@@ -6,8 +6,11 @@
 #endif
 #define DHTPIN 7
 #define DHTTYPE DHT11
-#define PIN 9
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(60, PIN, NEO_GRB + NEO_KHZ800);
+#define LEDInfo 9
+Adafruit_NeoPixel stripInfo = Adafruit_NeoPixel(12, LEDInfo, NEO_GRB + NEO_KHZ800);
+
+#define LEDShow 6
+Adafruit_NeoPixel stripShow = Adafruit_NeoPixel(12, LEDShow, NEO_GRB + NEO_KHZ800);
 
 
 
@@ -48,10 +51,6 @@ void setup() {
   #if defined (__AVR_ATtiny85__)
     if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
   #endif
-
-  strip.begin();
-  strip.setBrightness(10);
-  strip.show();
 }
 
 
@@ -104,34 +103,64 @@ void loop() {
     encoder0PinALast = n;
     }
 
-
-  colorWipe(strip.Color(250, 0, 0), 50);
-  colorWipe(strip.Color(200, 0, 0), 50);
-  colorWipe(strip.Color(150, 0, 0), 50);
-  colorWipe(strip.Color(100, 0, 0), 50);
-  colorWipe(strip.Color(50, 0, 0), 50);
-
-  colorWipe(strip.Color(0, 250, 0), 50);
-  colorWipe(strip.Color(0, 200, 0), 50);
-  colorWipe(strip.Color(0, 150, 0), 50);
-  colorWipe(strip.Color(0, 100, 0), 50);
-  colorWipe(strip.Color(0, 50, 0), 50);
-  
-  colorWipe(strip.Color(0, 0, 250), 50);
-  colorWipe(strip.Color(0, 0, 200), 50);
-  colorWipe(strip.Color(0, 0, 150), 50);
-  colorWipe(strip.Color(0, 0, 100), 50);
-  colorWipe(strip.Color(0, 0, 50), 50);
-
+  if (tempC < 16.00){
+    stripInfo.begin();
+    stripInfo.setBrightness(20);
+    stripInfo.show();
+    colorWipe(stripInfo.Color(255, 0, 0), 255);
+    stripShow.begin();
+    stripShow.setBrightness(10);
+    stripShow.show();
+    rainbow(50);
+  } else if (tempC <= 21.00) {
+    stripInfo.begin();
+    stripInfo.setBrightness(20);
+    stripInfo.show();
+    colorWipe(stripInfo.Color(255, 255, 0), 255);
+    stripShow.begin();
+    stripShow.setBrightness(10);
+    stripShow.show();
+    rainbow(50);
+  } else if (tempC < 25.00) {
+    stripInfo.begin();
+    stripInfo.setBrightness(20);
+    stripInfo.show();
+    colorWipe(stripInfo.Color(0, 255, 0), 255);
+    stripShow.begin();
+    stripShow.setBrightness(10);
+    stripShow.show();
+    rainbow(50);
+  } else {
+    stripInfo.begin();
+    stripInfo.setBrightness(20);
+    stripInfo.show();
+    colorWipe(stripInfo.Color(50, 50, 50), 50);
+    stripShow.begin();
+    stripShow.setBrightness(10);
+    stripShow.show();
+    rainbow(50);
+  }
+    
 
   }
 
 
 
 
-void colorWipe(uint32_t c, uint8_t wait) {
-  for(uint16_t i=0; i<strip.numPixels(); i++) {
-    strip.setPixelColor(i, c);
-    strip.show();
-    delay(10);  }
+void colorWipe(uint32_t color, int wait) {
+  for(int i=0; i<stripInfo.numPixels(); i++) {
+    stripInfo.setPixelColor(i, color);
+    stripInfo.show();
+    delay(wait);
   }
+}
+
+
+
+void rainbow(int wait) {
+  for(long firstPixelHue = 0; firstPixelHue < 25000*65536; firstPixelHue += 256) {
+    stripShow.rainbow(firstPixelHue);
+    stripShow.show();
+    delay(wait);
+  }
+}
